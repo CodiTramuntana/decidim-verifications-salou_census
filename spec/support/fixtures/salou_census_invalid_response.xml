@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <ns2:doCercaHabitantsResponse xmlns:ns2="http://habitants.ws.genesys.audifilm.com/">
+      <return/>
+    </ns2:doCercaHabitantsResponse>
+  </S:Body>
+</S:Envelope>
