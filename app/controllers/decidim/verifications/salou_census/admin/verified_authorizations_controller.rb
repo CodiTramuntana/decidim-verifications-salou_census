@@ -5,23 +5,24 @@ module Decidim
     module SalouCensus
       module Admin
         class VerifiedAuthorizationsController < Decidim::Admin::ApplicationController
-          layout "decidim/admin/users"
+          layout 'decidim/admin/users'
+
+          before_action :verified_authorizations
 
           helper Decidim::Verifications::SalouCensus::Admin::SalouCensusHelper
 
           def index
-            authorize! :index, Authorization
+            enforce_permission_to :index, :authorization
           end
 
           def reverify_all
-            authorize! :update, Authorization
-
+            enforce_permission_to :update, :authorization
             verified_authorizations.each do |verified_authorization|
               handler = SalouCensusAuthorizationHandler.from_model(verified_authorization)
               CheckSalouCensusUserAuthorization.call(verified_authorization, handler)
             end
 
-            flash[:info] = t("verified_authorizations.reverify_all.process_completed", scope: "decidim.verifications.salou_census.admin")
+            flash[:info] = t('verified_authorizations.reverify_all.process_completed', scope: 'decidim.verifications.salou_census.admin')
 
             redirect_to root_path
           end
@@ -29,7 +30,7 @@ module Decidim
           private
 
           def verified_authorizations
-            @verified_authorizations ||= Authorizations.new(organization: current_organization, user: nil, name: "salou_census", granted: true)
+            @verified_authorizations ||= Authorizations.new(organization: current_organization, user: nil, name: 'salou_census', granted: true)
                                                        .query
           end
         end

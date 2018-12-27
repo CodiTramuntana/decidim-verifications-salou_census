@@ -2,6 +2,7 @@
 
 require 'rails'
 require 'decidim/core'
+require "decidim/verifications"
 
 module Decidim
   module Verifications

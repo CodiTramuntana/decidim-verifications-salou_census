@@ -6,7 +6,7 @@ module Decidim
       # A form object to be used when public users want to get verified by
       # Salou Census verificator
       class SalouCensusForm < SalouCensusAuthorizationHandler
-        DOCUMENT_NUMBER_REGEXP = /\A[XYZ0-9]{1}[0-9]{7}[A-Z]{1}/
+        DOCUMENT_NUMBER_REGEXP = /\A[XYZ0-9]{1}[0-9]{7}[A-Z]{1}/.freeze
 
         attribute :document_number, String
         attribute :birthdate, Date
@@ -14,7 +14,7 @@ module Decidim
 
         validates :birthdate, presence: true
         validates :document_number,
-                  format: { with: DOCUMENT_NUMBER_REGEXP, message: I18n.t("errors.messages.salou_census.not_valid_dni_or_nie") },
+                  format: { with: DOCUMENT_NUMBER_REGEXP, message: I18n.t('errors.messages.salou_census.not_valid_dni_or_nie') },
                   presence: true
 
         # Generates a verification code, with Form data. Then proceed to check if
@@ -33,7 +33,7 @@ module Decidim
         #
         # Returns the verification_code as String
         def generate_verification_code
-          self.verification_code = SalouCensusDigest.new("form", form_data_attributes).generate
+          self.verification_code = SalouCensusDigest.new('form', form_data_attributes).generate
         end
 
         # For new authorizations, we check that no other one has the same verification_code
@@ -41,19 +41,19 @@ module Decidim
         #
         # Returns nothing
         def check_other_verification_code
-          authorizations = Authorizations.new(organization: user.organization, name: "salou_census")
+          authorizations = Authorizations.new(organization: user.organization, name: 'salou_census')
                                          .query
                                          .where.not(user: user)
                                          .where(%(metadata @> '{"verification_code": "#{verification_code}"}'))
 
-          errors.add(:base, I18n.t("errors.messages.salou_census.duplicated")) if authorizations.any?
+          errors.add(:base, I18n.t('errors.messages.salou_census.duplicated')) if authorizations.any?
         end
 
         # For reverifications, Form data must be as equal as saved in Authorization
         #
         # Returns nothing
         def check_own_verification_code
-          errors.add(:base, I18n.t("errors.messages.salou_census.not_correspond")) unless persisted.verification_code == verification_code
+          errors.add(:base, I18n.t('errors.messages.salou_census.not_correspond')) unless persisted.verification_code == verification_code
         end
 
         # Check for WS needed values
@@ -68,29 +68,40 @@ module Decidim
         # Returns a XML string
         def request_body
           @request_body ||= <<~XML
-            <e>
-              <ope>
-                <apl>PAD</apl>
-                <tobj>HAB</tobj>
-                <cmd>CONSULTAESTADO</cmd>
-                <ver>2.0</ver>
-              </ope>
-              <sec>
-                <cli>#{SalouCensusAuthorizationConfig.param(:cli)}</cli>
-                <org>#{SalouCensusAuthorizationConfig.param(:org)}</org>
-                <ent>#{SalouCensusAuthorizationConfig.param(:ent)}</ent>
-                <usu>#{SalouCensusAuthorizationConfig.param(:usu)}</usu>
-                <pwd>#{SalouCensusAuthorizationConfig.param(:pwd)}</pwd>
-                <fecha>#{SalouCensusAuthorizationConfig.param(:fecha)}</fecha>
-                <nonce>#{SalouCensusAuthorizationConfig.param(:nonce)}</nonce>
-                <token>#{SalouCensusAuthorizationConfig.param(:token)}</token>
-              </sec>
-              <par>
-                <documento>#{sanitize_document_number}</documento>
-                <fechaNacimiento>#{sanitize_birthdate}</fechaNacimiento>
-                <busquedaExacta>-1</busquedaExacta>
-              </par>
-            </e>
+            <soapenv:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ci="http://ci.sw.aytos">
+              <soapenv:Header/>
+              <soapenv:Body>
+                <ci:servicio soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                  <in0 xsi:type="soapenc:string" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">
+                    <![CDATA[
+                      <e>
+                        <ope>
+                          <apl>PAD</apl>
+                          <tobj>HAB</tobj>
+                          <cmd>ISHABITANTE</cmd>
+                          <ver>2.0</ver>
+                        </ope>
+                        <sec>
+                          <cli>#{SalouCensusAuthorizationConfig.param(:cli)}</cli>
+                          <org>#{SalouCensusAuthorizationConfig.param(:org)}</org>
+                          <ent>#{SalouCensusAuthorizationConfig.param(:ent)}</ent>
+                          <usu>#{SalouCensusAuthorizationConfig.param(:usu)}</usu>
+                          <pwd>#{SalouCensusAuthorizationConfig.param(:pwd)}</pwd>
+                          <fecha>#{request_params[:fecha]}</fecha>
+                          <nonce>#{request_params[:nonce]}</nonce>
+                          <token>#{request_params[:token]}</token>
+                        </sec>
+                        <par>
+                          <codigoTipoDocumento>1</codigoTipoDocumento>
+                          <documento>#{cipherData(sanitize_document_number)}</documento>
+                          <mostrarFechaNac>-1</mostrarFechaNac>
+                        </par>
+                      </e>
+                    ]]>
+                  </in0>
+                </ci:servicio>
+              </soapenv:Body>
+            </soapenv:Envelope>
           XML
         end
 
@@ -101,17 +112,17 @@ module Decidim
           @sanitize_document_number ||= document_number&.to_s
         end
 
-        # Birthdate must be in a DD/MM/YYYY format to be accepted for the WS
+        # Birthdate must be in a DD/MM/YYYY format
         #
         # Returns a String
         def sanitize_birthdate
-          @sanitize_birthdate ||= birthdate&.strftime("%d/%m/%Y")
+          @sanitize_birthdate ||= birthdate&.strftime('%d/%m/%Y')
         end
 
         def form_data_attributes
           {
-            document_number: document_number,
-            birthdate: birthdate
+            document_number: sanitize_document_number,
+            birthdate: sanitize_birthdate
           }
         end
       end

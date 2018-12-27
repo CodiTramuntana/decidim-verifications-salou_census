@@ -6,19 +6,18 @@ ruby RUBY_VERSION
 
 gemspec
 
-gem 'decidim', require: true
-# gem "decidim-verifications-salou_census", path: "."
+gem "rails", "5.2.1"
 
-# gem "puma", "~> 3.0"
-# gem "uglifier", "~> 4.1"
+gem 'decidim', "0.14.3"
 
 group :development, :test do
-  gem 'bootsnap', require: false
-  # gem "byebug", "~> 10.0", platform: :mri
+  gem 'byebug', '~> 10.0', platform: :mri
+  gem "bootsnap", require: true
+  gem 'faker', '~> 1.8'
+  gem 'listen'
 end
 
 group :development do
-  # gem "spring", "~> 2.0"
-  # gem "spring-watcher-listen", "~> 2.0"
-  # gem "web-console", "~> 3.5"
+  gem 'letter_opener_web', '~> 1.3.3'
+  gem 'web-console', '~> 3.5'
 end

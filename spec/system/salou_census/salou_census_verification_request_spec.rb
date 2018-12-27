@@ -42,7 +42,6 @@ describe 'Salou Census verification request', type: :system do
   end
 
   it 'allows the user to fill up form field', salou_census_stub_type: :valid do
-
     submit_salou_census_form(
       document_number: valid_salou_census[:document_number],
       birthdate: valid_salou_census[:birthdate]

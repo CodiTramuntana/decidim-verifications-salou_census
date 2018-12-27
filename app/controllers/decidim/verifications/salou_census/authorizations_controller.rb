@@ -23,11 +23,11 @@ module Decidim
 
           ConfirmSalouCensusUserAuthorization.call(authorization, @form) do
             on(:ok) do
-              flash[:notice] = t("authorizations.create.success", scope: "decidim.verifications.salou_census")
+              flash[:notice] = t('authorizations.create.success', scope: 'decidim.verifications.salou_census')
               redirect_to decidim_verifications.authorizations_path
             end
             on(:invalid) do
-              flash.now[:alert] = t("authorizations.create.error", scope: "decidim.verifications.salou_census")
+              flash.now[:alert] = t('authorizations.create.error', scope: 'decidim.verifications.salou_census')
               render :new
             end
           end
@@ -46,11 +46,11 @@ module Decidim
 
           ConfirmSalouCensusUserAuthorization.call(authorization, @form) do
             on(:ok) do
-              flash[:notice] = t("authorizations.create.success", scope: "decidim.verifications.salou_census")
+              flash[:notice] = t('authorizations.create.success', scope: 'decidim.verifications.salou_census')
               redirect_to decidim_verifications.authorizations_path
             end
             on(:invalid) do
-              flash.now[:alert] = t("authorizations.create.error", scope: "decidim.verifications.salou_census")
+              flash.now[:alert] = t('authorizations.create.error', scope: 'decidim.verifications.salou_census')
               render :edit
             end
           end
@@ -65,7 +65,7 @@ module Decidim
         def load_authorization
           @authorization = Decidim::Authorization.find_or_initialize_by(
             user: current_user,
-            name: "salou_census"
+            name: 'salou_census'
           )
         end
       end

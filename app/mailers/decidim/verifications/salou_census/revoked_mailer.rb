@@ -11,7 +11,7 @@ module Decidim
             @user = user
             @authorization = authorization
             @organization = @user.organization
-            subject = I18n.t("revoked.subject", scope: "decidim.verifications.salou_census.revoked_mailer")
+            subject = I18n.t('revoked.subject', scope: 'decidim.verifications.salou_census.revoked_mailer')
 
             mail(to: user.email, subject: subject)
           end

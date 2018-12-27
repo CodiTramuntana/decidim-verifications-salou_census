@@ -1,8 +1,12 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
-  <S:Body>
-    <ns2:doCercaHabitantsResponse xmlns:ns2="http://habitants.ws.genesys.audifilm.com/">
-      <return/>
-    </ns2:doCercaHabitantsResponse>
-  </S:Body>
-</S:Envelope>
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <soapenv:Body>
+        <ns1:servicioResponse soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:ns1="http://ci.sw.aytos">
+            <servicioReturn xsi:type="soapenc:string" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">&lt;s&gt;&lt;sec&gt;&lt;nonce&gt;73170873596&lt;/nonce&gt;&lt;/sec&gt;&lt;res&gt;&lt;exito&gt;-1&lt;/exito&gt;&lt;/res&gt;&lt;par&gt;
+&lt;isHabitante&gt;0&lt;/isHabitante&gt;
+&lt;fechaNacimiento&gt;&lt;/fechaNacimiento&gt;
+&lt;/par&gt;
+&lt;/s&gt;</servicioReturn>
+        </ns1:servicioResponse>
+    </soapenv:Body>
+</soapenv:Envelope>

@@ -1,0 +1,61 @@
+---
+ca:
+  activemodel:
+    attributes:
+      salou_census:
+        document_number: DNI/NIE
+        birthdate: Data de naixement
+  decidim:
+    authorization_handlers:
+      salou_census:
+        explanation: Introduïu el DNI o NIE i la data de naixement per poder verificar el padró
+        name: Verificació amb padró de Salou
+    components:
+      salou_census:
+        name: Padró de Salou
+    verifications:
+      authorizations:
+        first_login:
+          actions:
+            salou_census: Verifica't mitjançant el padró de Salou
+      salou_census:
+        admin:
+          actions:
+            reverify_all: Tornar a verificar totes
+            confirm_reverify_all: Estàs segur de voler tornar a verificar totes les autoritzacions?
+          verified_authorizations:
+            index:
+              title: Verificacions emmagatzemades
+              total: Total
+              count:
+                one: "1 verificació"
+                other: "%{count} verificacions"
+                zero: "Sense verificacions"
+            reverify_all:
+              process_completed: "Procés de reverificació completat"
+
+        authorizations:
+          create:
+            error: Ha sorgit un problema generant la petició
+            success: Verificació amb el padró de Salou completada correctament
+          form:
+            send: Demana verificació
+            sending: "S'está demanant"
+            title: Verificar amb el padró de Salou
+        revoked_mailer:
+          revoked:
+            body: Si desitja tornar a realitzar la verificació, faci clic <a href="%{resource_path}">aquí</a>.
+            intro: La seva verificació amb el padró de Salou ha sigut revocada
+            subject: La seva verificació amb el padró de Salou ha sigut revocada
+  errors:
+    messages:
+      salou_census:
+        already_confirmed: Ja havieu estat confirmat
+        cannot_validate: El padró de Salou no pot validar les seves dades
+        connection_failed: "No es possible connectar amb el padró de Salou. Siusplau, intenti-ho més tard."
+        connection_timeout: "El padró de Salou no está responent a la verificació. Siusplau, intenti-ho més tard."
+        duplicated: Aquestes dades ya han estas usades
+        not_correspond: Aquestes dades no es corresponen amb la verificació prèvia
+        not_exist: No existeix una verificació prèvia
+        not_valid_dni_or_nie: El format del DNI/NIE no és válid. Ha d'anar sense guions "-". Totes les lletres han de ser en majúscules, només contenir lletres i números, i començar per un número o les lletres X, Y o Z.
+        not_valid: Les seves dades no corresponen amb el padró.

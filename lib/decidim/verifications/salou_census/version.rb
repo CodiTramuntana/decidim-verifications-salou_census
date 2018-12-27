@@ -5,7 +5,7 @@ module Decidim
   module Verifications
     module SalouCensus
       def self.version
-        '0.14.3'
+        '0.1.0'
       end
     end
   end

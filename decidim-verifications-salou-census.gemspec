@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.authors = ['MarcReniu']
   s.email = ['marc.rs@coditramuntana.com']
   s.license = 'AGPL-3.0'
-  s.homepage = 'https://github.com/decidim/decidim-module-VerificationsSalouCensus'
+  s.homepage = 'https://gitlab.coditdev.net/decidim/decidim-verifications-salou_census'
   s.required_ruby_version = '>= 2.3.1'
 
   s.name = 'decidim-verifications-salou_census'
@@ -18,12 +18,12 @@ Gem::Specification.new do |s|
 
   s.files = Dir['{app,config,lib}/**/*', 'LICENSE-AGPLv3.txt', 'Rakefile', 'README.md']
 
-  s.add_dependency 'decidim', Decidim::Verifications::SalouCensus.version
-  s.add_dependency 'decidim-admin', Decidim::Verifications::SalouCensus.version
+  DECIDIM_VERSION = '0.14.3'
+
+  s.add_dependency "decidim-core", DECIDIM_VERSION
+  s.add_dependency 'decidim-admin', DECIDIM_VERSION
+  s.add_dependency 'decidim-verifications', DECIDIM_VERSION
   s.add_dependency 'rails', '>= 5.2'
 
-  s.add_development_dependency 'decidim-dev', Decidim::Verifications::SalouCensus.version
-  s.add_development_dependency 'faker'
-  s.add_development_dependency 'letter_opener_web', '~> 1.3.3'
-  s.add_development_dependency 'listen'
+  s.add_development_dependency 'decidim-dev', DECIDIM_VERSION
 end

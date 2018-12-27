@@ -13,14 +13,14 @@ describe 'Salou Census verification request', type: :system do
       :pending,
       user: user,
       name: 'salou_census',
-      metadata: { verification_code: '69d778c55bd6355bdf643a5feb9407d0bd5d2af639f68825c079feeca9596e29651970146a3d6f1b86960167d14e274bb89370d494c9e677628dfd51618f715d' }
+      metadata: { document_number: "MDAwMDAwMDBU\n", birthdate: "MTgvMDEvMTk3Mw==\n", verification_code: 'f745d59c33d68ad194247e6a2a197e90258da77977605c1a6c421c5df3e384b48f863071f4aa944e08a0be69bec38ca30737da1103578aadd09ca0f9383a9456' }
     )
   end
 
   let!(:salou_census_data) do
     {
       document_number: '00000000T',
-      birthdate: Date.new(1970, 1, 1)
+      birthdate: Date.new(1973, 1, 18)
     }
   end
 

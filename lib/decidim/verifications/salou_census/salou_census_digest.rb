@@ -14,6 +14,7 @@ module Decidim
 
         def generate
           return nil unless valid_data?
+
           create_digest
         end
 
@@ -21,6 +22,7 @@ module Decidim
 
         def valid_data?
           return false unless @data.is_a?(Hash)
+
           FIELDS.each do |field|
             return false if @data[field].blank?
           end

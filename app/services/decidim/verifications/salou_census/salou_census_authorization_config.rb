@@ -16,6 +16,7 @@ module Decidim
           # `key` value for SalouCensus WS
           def param(key)
             return unless valid_param?(key)
+
             Rails.application.secrets.salou_census[:"salou_census_#{key}"]
           end
 
@@ -27,7 +28,7 @@ module Decidim
           private
 
           def valid_param?(key)
-            %i[cli org ent usu pwd fecha nonce token].include? key.to_sym
+            %i[cli org ent usu pwd key].include? key.to_sym
           end
         end
       end
