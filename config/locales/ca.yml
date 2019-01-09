@@ -59,3 +59,4 @@ ca:
         not_exist: No existeix una verificació prèvia
         not_valid_dni_or_nie: El format del DNI/NIE no és válid. Ha d'anar sense guions "-". Totes les lletres han de ser en majúscules, només contenir lletres i números, i començar per un número o les lletres X, Y o Z.
         not_valid: Les seves dades no corresponen amb el padró.
+        too_young: Ha de tenir almenys 16 anys

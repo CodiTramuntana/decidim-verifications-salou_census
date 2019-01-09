@@ -17,6 +17,8 @@ module Decidim
                   format: { with: DOCUMENT_NUMBER_REGEXP, message: I18n.t('errors.messages.salou_census.not_valid_dni_or_nie') },
                   presence: true
 
+        validate :check_legal_age
+
         # Generates a verification code, with Form data. Then proceed to check if
         # it already exists in DB, or correspond with related authorization
         #
@@ -27,7 +29,26 @@ module Decidim
           errors.empty?
         end
 
+        # Checks for birthdate greater or equal than 16 years. For fewer years, it adds
+        # and error to form object
+        #
+        # Returns nothing
+        def check_legal_age
+          return unless age_from_birthdate
+          if age_from_birthdate < 16
+            errors.add(:birthdate, I18n.t('errors.messages.salou_census.too_young'))
+          end
+        end
+
         private
+
+        # Calculate age using birthdate
+        #
+        # Returns age as Integer
+        def age_from_birthdate
+          return @age unless self.birthdate.presence
+          @age ||= ((Time.now - self.birthdate.to_time) / 1.years).floor
+        end
 
         # Generate a verification_code with SalouCensusDigest lib, using form data
         #

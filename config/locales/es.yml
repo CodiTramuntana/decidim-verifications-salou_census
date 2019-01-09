@@ -58,3 +58,4 @@ es:
         not_exist: No existe una verificación previa
         not_valid_dni_or_nie: El formato del DNI/NIE no es válido. Debe ir sin guiones "-". Todas las letras deben ser mayúsculas, solo contener letras y números, y empezar por un número o las letras X, Y o Z.
         not_valid: Sus datos no corresponden con el padrón.
+        too_young: Debe tener al menos 16 años de edad

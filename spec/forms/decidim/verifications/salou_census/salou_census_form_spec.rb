@@ -49,6 +49,16 @@ module Decidim
               .to include("can't be blank")
           end
         end
+
+        context 'when the birthdate is closer than 16 years from now' do
+          let(:birthdate) { Date.today }
+
+          it 'is not valid' do
+            expect(subject).not_to be_valid
+            expect(subject.errors[:birthdate])
+              .to include("You must be at least 16 years old")
+          end
+        end
       end
     end
   end

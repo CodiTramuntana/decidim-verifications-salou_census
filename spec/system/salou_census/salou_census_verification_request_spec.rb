@@ -27,7 +27,7 @@ describe 'Salou Census verification request', type: :system do
   let!(:invalid_salou_census) do
     {
       document_number: 'XXXXXXXXX',
-      birthdate: ''
+      birthdate: Date.today
     }
   end
 
@@ -54,10 +54,11 @@ describe 'Salou Census verification request', type: :system do
   it 'shows an error when data is not valid' do
     submit_salou_census_form(
       document_number: invalid_salou_census[:document_number],
-      birthdate: valid_salou_census[:birthdate]
+      birthdate: invalid_salou_census[:birthdate]
     )
 
     expect(page).to have_content('Not valid DNI/NIE. Must be all uppercase, contain only letters and/or numbers, and start with a number or letters X, Y or Z.')
+    expect(page).to have_content('You must be at least 16 years old')
   end
 
   it 'shows an error when data is not valid in Salou Census', salou_census_stub_type: :invalid do
@@ -71,8 +72,8 @@ describe 'Salou Census verification request', type: :system do
 
   it 'does not submit when data is not fulfilled' do
     submit_salou_census_form(
-      document_number: invalid_salou_census[:document_number],
-      birthdate: invalid_salou_census[:birthdate]
+      document_number: '',
+      birthdate: ''
     )
 
     expect(page).to have_current_path decidim_salou_census.root_path

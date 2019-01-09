@@ -58,3 +58,4 @@ en:
         not_exist: Does not exist a previous verification
         not_valid_dni_or_nie: Not valid DNI/NIE. Must be all uppercase, contain only letters and/or numbers, and start with a number or letters X, Y or Z.
         not_valid: Your data do not correspond to the census
+        too_young: You must be at least 16 years old

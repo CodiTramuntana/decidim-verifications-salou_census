@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    decidim-verifications-salou_census (0.0.1)
+    decidim-verifications-salou_census (0.2.0)
       decidim-admin (= 0.14.3)
       decidim-core (= 0.14.3)
       decidim-verifications (= 0.14.3)
