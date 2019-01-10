@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe 'Salou Census verification request', type: :system do
   let!(:organization) do
-    create(:organization, available_authorizations: ['salou_census'])
+    create(:organization, available_authorizations: ['salou_census_authorization_handler'])
   end
   let!(:user) { create(:user, :confirmed, organization: organization) }
   let!(:user2) { create(:user, :confirmed, organization: organization) }
@@ -13,7 +13,7 @@ describe 'Salou Census verification request', type: :system do
       :authorization,
       :granted,
       user: user2,
-      name: 'salou_census',
+      name: 'salou_census_authorization_handler',
       metadata: { verification_code: '69d778c55bd6355bdf643a5feb9407d0bd5d2af639f68825c079feeca9596e29651970146a3d6f1b86960167d14e274bb89370d494c9e677628dfd51618f715d' }
     )
   end
@@ -26,7 +26,7 @@ describe 'Salou Census verification request', type: :system do
   end
   let!(:invalid_salou_census) do
     {
-      document_number: 'XXXXXXXXX',
+      document_number: '',
       birthdate: Date.today
     }
   end
@@ -34,7 +34,7 @@ describe 'Salou Census verification request', type: :system do
   before do
     switch_to_host(organization.host)
     login_as user, scope: :user
-    visit decidim_salou_census.root_path
+    visit decidim_verifications.new_authorization_path(handler: "salou_census_authorization_handler")
   end
 
   it 'redirects to verification after login' do
@@ -48,7 +48,7 @@ describe 'Salou Census verification request', type: :system do
     )
 
     expect(page).to have_current_path decidim_verifications.authorizations_path
-    expect(page).to have_content('Salou Census verification requested successfully')
+    expect(page).to have_content("You've been successfully authorized")
   end
 
   it 'shows an error when data is not valid' do
@@ -56,8 +56,12 @@ describe 'Salou Census verification request', type: :system do
       document_number: invalid_salou_census[:document_number],
       birthdate: invalid_salou_census[:birthdate]
     )
+    expect(page).to have_content("There's an error in this field")
 
-    expect(page).to have_content('Not valid DNI/NIE. Must be all uppercase, contain only letters and/or numbers, and start with a number or letters X, Y or Z.')
+    submit_salou_census_form(
+      document_number: valid_salou_census[:document_number],
+      birthdate: invalid_salou_census[:birthdate]
+    )
     expect(page).to have_content('You must be at least 16 years old')
   end
 
@@ -76,7 +80,7 @@ describe 'Salou Census verification request', type: :system do
       birthdate: ''
     )
 
-    expect(page).to have_current_path decidim_salou_census.root_path
+    expect(page).to have_current_path decidim_verifications.new_authorization_path(handler: "salou_census_authorization_handler")
   end
 
   it 'with same verification data should fail' do
@@ -90,12 +94,9 @@ describe 'Salou Census verification request', type: :system do
   private
 
   def submit_salou_census_form(document_number:, birthdate:)
-    fill_in 'DNI/NIE', with: document_number
-    if birthdate.presence
-      page.execute_script(%{$("#date_field_salou_census_birthdate").fdatepicker("update", "#{birthdate.strftime('%d/%m/%Y')}")})
-      page.execute_script(%{$("#date_field_salou_census_birthdate").trigger({type: "changeDate", date: "#{birthdate.strftime('%Y/%m/%d')}"})})
-    end
+    fill_in 'Document number', with: document_number
+    fill_in 'Birthdate', with: birthdate
 
-    click_button 'Request verification'
+    click_button 'Send'
   end
 end

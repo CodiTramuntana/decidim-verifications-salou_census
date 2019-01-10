@@ -30,11 +30,11 @@ module Decidim
           protected
 
           def revoke!
-            authorization.update!(granted_at: nil)
+            authorization.destroy
           end
 
           def send_revoke_email
-            Decidim::Verifications::SalouCensus::RevokedMailer.revoked(authorization.user, authorization).deliver_later
+            Decidim::Verifications::SalouCensus::RevokedMailer.revoked(authorization.user).deliver_later
           end
         end
       end

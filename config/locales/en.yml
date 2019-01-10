@@ -2,45 +2,23 @@
 en:
   activemodel:
     attributes:
-      salou_census:
-        document_number: DNI/NIE
+      salou_census_authorization_handler:
+        document_number: Document number
         birthdate: Birthdate
   decidim:
     authorization_handlers:
-      salou_census:
+      salou_census_authorization_handler:
         explanation: Enter your document number and birthdate so we can check your location
-        name: Salou Census verification
+        name: Salou Census
     components:
-      salou_census:
+      salou_census_authorization_handler:
         name: Salou Census
     verifications:
       authorizations:
         first_login:
           actions:
-            salou_census: Get verified by Salou Census verificator
-      salou_census:
-        admin:
-          actions:
-            reverify_all: Reverify all
-            confirm_reverify_all: Are you sure you want to reverify all authorizations?
-          verified_authorizations:
-            index:
-              title: Stored verifications
-              total: Total
-              count:
-                one: "1 verification"
-                other: "%{count} verifications"
-                zero: "Without verifications"
-            reverify_all:
-              process_completed: "Reverify process completed"
-        authorizations:
-          create:
-            error: There was a problem performing the request
-            success: Salou Census verification requested successfully
-          form:
-            send: Request verification
-            sending: Requesting
-            title: Verify with Salou Census
+            salou_census_authorization_handler: Get verified by Salou Census verificator
+      salou_census_authorization_handler:
         revoked_mailer:
           revoked:
             body: If you want to reverify it, click <a href="%{resource_path}">here</a>.
@@ -48,7 +26,7 @@ en:
             subject: Your Salou Census verification has been revoked
   errors:
     messages:
-      salou_census:
+      salou_census_authorization_handler:
         already_confirmed: You had been already confirmed
         cannot_validate: Salou Census cannot validate your data
         connection_failed: "It is not possible to connect with Salou Census. Please, try again later."
@@ -56,6 +34,5 @@ en:
         duplicated: These data have already been used
         not_correspond: These data do not correspond with the previous verification
         not_exist: Does not exist a previous verification
-        not_valid_dni_or_nie: Not valid DNI/NIE. Must be all uppercase, contain only letters and/or numbers, and start with a number or letters X, Y or Z.
         not_valid: Your data do not correspond to the census
         too_young: You must be at least 16 years old
