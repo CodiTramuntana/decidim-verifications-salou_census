@@ -6,10 +6,9 @@ module Decidim
       # A custom mailer for sending notifications to users when
       # they join a meeting.
       class RevokedMailer < Decidim::ApplicationMailer
-        def revoked(user, authorization)
+        def revoked(user)
           with_user(user) do
             @user = user
-            @authorization = authorization
             @organization = @user.organization
             subject = I18n.t('revoked.subject', scope: 'decidim.verifications.salou_census.revoked_mailer')
 

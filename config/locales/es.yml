@@ -2,45 +2,23 @@
 es:
   activemodel:
     attributes:
-      salou_census:
-        document_number: DNI/NIE
+      salou_census_authorization_handler:
+        document_number: Documento de identidad
         birthdate: Fecha de nacimiento
   decidim:
     authorization_handlers:
-      salou_census:
-        explanation: Introduzca su DNI/NIE y la fecha de nacimiento para poder verificar el padrón
-        name: Verificación con el padrón de Salou
+      salou_census_authorization_handler:
+        explanation: Introduzca su documento de identidad y la fecha de nacimiento para poder verificar el padrón
+        name: Padrón de Salou
     components:
-      salou_census:
+      salou_census_authorization_handler:
         name: Padrón de Salou
     verifications:
       authorizations:
         first_login:
           actions:
-            salou_census: Verifícate mediante el padrón de Salou
-      salou_census:
-        admin:
-          actions:
-            reverify_all: Volver a verificar todas
-            confirm_reverify_all: ¿Estás seguro de querer verificar todas las autorizaciones de nuevo?
-          verified_authorizations:
-            index:
-              title: Verificaciones almacenadas
-              total: Total
-              count:
-                one: "1 verificación"
-                other: "%{count} verificaciones"
-                zero: "Sin verificaciones"
-            reverify_all:
-              process_completed: "Proceso de reverificación completado"
-        authorizations:
-          create:
-            error: Ha surgido un problema generando la petición
-            success: Verificación con el padrón de Salou completada correctamente
-          form:
-            send: Pida verificación
-            sending: Pidiendo
-            title: Verificar con el padrón de Salou
+            salou_census_authorization_handler: Verifícate mediante el padrón de Salou
+      salou_census_authorization_handler:
         revoked_mailer:
           revoked:
             body: Si desea volver a realizar la verificación, haga clic <a href="%{resource_path}">aquí</a>.
@@ -48,7 +26,7 @@ es:
             subject: Su verificación con el padrón de Salou ha sido revocada
   errors:
     messages:
-      salou_census:
+      salou_census_authorization_handler:
         already_confirmed: Ja había sido confirmado
         cannot_validate: El padrón de Salou no puede validar sus datos
         connection_failed: "No es posible conectar con el padrón de Salou. Por favor, inténtelo mas tarde."
@@ -56,6 +34,5 @@ es:
         duplicated: Estos datos ya han sido usados
         not_correspond: Estos datos no corresponded con la verificación anterior
         not_exist: No existe una verificación previa
-        not_valid_dni_or_nie: El formato del DNI/NIE no es válido. Debe ir sin guiones "-". Todas las letras deben ser mayúsculas, solo contener letras y números, y empezar por un número o las letras X, Y o Z.
         not_valid: Sus datos no corresponden con el padrón.
         too_young: Debe tener al menos 16 años de edad

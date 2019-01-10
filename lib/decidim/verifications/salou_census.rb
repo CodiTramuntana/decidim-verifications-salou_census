@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-require 'decidim/verifications/salou_census/admin'
 require 'decidim/verifications/salou_census/engine'
-require 'decidim/verifications/salou_census/admin_engine'
 require 'decidim/verifications/salou_census/workflow'
 
 module Decidim

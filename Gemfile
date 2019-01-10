@@ -8,7 +8,7 @@ gemspec
 
 gem "rails", "5.2.1"
 
-gem 'decidim', "0.14.3"
+gem 'decidim', "~> 0.15.2"
 
 group :development, :test do
   gem 'byebug', '~> 10.0', platform: :mri

@@ -63,7 +63,7 @@ module Decidim
         end
 
         def format_data_for_value(value)
-          value.upcase
+          value.try(:upcase)
         end
       end
     end

@@ -4,34 +4,21 @@ module Decidim
   module Verifications
     module SalouCensus
       class SalouCensusAuthorizationHandler < Decidim::AuthorizationHandler
-        attribute :verification_code, String
-        attribute :document_number, String
-        attribute :birthdate, String
 
-        def handler_name
-          'salou_census'
-        end
+        attribute :document_number, String
+        attribute :birthdate, Decidim::Attributes::LocalizedDate
+
+        validates :birthdate, presence: true
+        validates :document_number, presence: true
+
+        validate :check_legal_age
+        validate :check_verification_code
+        validate :salou_census_valid?
 
         def map_model(model)
-          self.verification_code = model.metadata.try(:[], 'verification_code')
+          @verification_code = model.metadata.try(:[], 'verification_code')
           self.document_number = decipherData(model.metadata.try(:[], 'document_number'))
           self.birthdate = decipherData(model.metadata.try(:[], 'birthdate'))
-        end
-
-        # Checks the response of SalouCensus WS, and add errors in bad cases
-        #
-        # Returns a boolean
-        def salou_census_valid?
-          return false if errors.any? || response.blank?
-
-          if success_response?
-            unless census_exist?
-              errors.add(:base, I18n.t('errors.messages.salou_census.not_valid'))
-            end
-          else
-            errors.add(:base, I18n.t('errors.messages.salou_census.cannot_validate'))
-          end
-          errors.empty?
         end
 
         # Generates a verification_code to check it with the saved one
@@ -44,15 +31,120 @@ module Decidim
         end
 
         def metadata
-          generate_sanitized_verification_code
           {
             document_number: cipherData(sanitize_document_number),
             birthdate: cipherData(sanitize_birthdate),
-            verification_code: verification_code
+            verification_code: generate_sanitized_verification_code
           }
         end
 
+        # Generates a verification code, with Form data. Then proceed to check if
+        # it already exists in DB, or correspond with related authorization
+        #
+        # Returns a boolean
+        def check_verification_code
+          check_other_verification_code
+          check_own_verification_code
+          errors.empty?
+        end
+
+        # Checks the response of SalouCensus WS, and add errors in bad cases
+        #
+        # Returns a boolean
+        def salou_census_valid?
+          return false if errors.any? || response.blank?
+
+          if success_response?
+            unless census_exist?
+              errors.add(:base, I18n.t('errors.messages.salou_census_authorization_handler.not_valid'))
+            end
+          else
+            errors.add(:base, I18n.t('errors.messages.salou_census_authorization_handler.cannot_validate'))
+          end
+          errors.empty?
+        end
+
         private
+
+        # Checks for birthdate greater or equal than 16 years. For fewer years, it adds
+        # and error to form object
+        #
+        # Returns nothing
+        def check_legal_age
+          return unless age_from_birthdate
+          if age_from_birthdate < 16
+            errors.add(:birthdate, I18n.t('errors.messages.salou_census_authorization_handler.too_young'))
+          end
+        end
+
+        # Calculate age using birthdate
+        #
+        # Returns age as Integer
+        def age_from_birthdate
+          return @age unless self.birthdate.presence
+          @age ||= ((Time.now - self.birthdate.to_time) / 1.years).floor
+        end
+
+        # Generate a verification_code with SalouCensusDigest lib, using form data
+        #
+        # Returns the verification_code as String
+        def verification_code
+          @verification_code ||= SalouCensusDigest.new('form', form_data_attributes).generate
+        end
+
+        # For new authorizations, we check that no other one has the same verification_code
+        # It is scoped with current_user organization
+        #
+        # Returns nothing
+        def check_other_verification_code
+          authorizations = Authorizations.new(organization: user.organization, name: handler_name)
+                                         .query
+                                         .where.not(user: user)
+                                         .where(%(metadata @> '{"verification_code": "#{verification_code}"}'))
+
+          errors.add(:base, I18n.t('errors.messages.salou_census_authorization_handler.duplicated')) if authorizations.any?
+        end
+
+        # For reverifications, Form data must be as equal as saved in Authorization
+        #
+        # Returns nothing
+        def check_own_verification_code
+          authorization = Authorizations.new(organization: user.organization, name: handler_name)
+                                         .query
+                                         .where(user: user)
+                                         .find_by(%(metadata @> '{"verification_code": "#{verification_code}"}'))
+
+          return unless authorization
+          errors.add(:base, I18n.t('errors.messages.salou_census_authorization_handler.not_correspond')) unless authorization.verification_code == verification_code
+        end
+
+        # Check for WS needed values
+        #
+        # Returns a boolean
+        def uncomplete_credentials?
+          sanitize_document_number.blank? || sanitize_birthdate.blank?
+        end
+
+        # Document number parameter, as String
+        #
+        # Returns a String
+        def sanitize_document_number
+          @sanitize_document_number ||= document_number&.to_s
+        end
+
+        # Birthdate must be in a DD/MM/YYYY format
+        #
+        # Returns a String
+        def sanitize_birthdate
+          @sanitize_birthdate ||= birthdate&.strftime('%d/%m/%Y')
+        end
+
+        def form_data_attributes
+          {
+            document_number: sanitize_document_number,
+            birthdate: sanitize_birthdate
+          }
+        end
 
         # Check for WS needed values
         #
@@ -70,22 +162,26 @@ module Decidim
 
           return @response if already_processed?
 
+          rs = request_ws
+          return nil unless rs
+
+          @response ||= { body: rs.body, status: rs.status }
+        end
+
+        def request_ws
           begin
-            response ||= Faraday.post do |request|
+            ws_response = Faraday.post do |request|
               request.url SalouCensusAuthorizationConfig.url
               request.headers['Content-Type'] = 'text/xml'
               request.headers['SOAPAction'] = 'ISHABITANTE'
               request.body = request_body
             end
-            @response ||= {
-              body: response.body,
-              status: response.status
-            }
+            return ws_response
           rescue Faraday::ConnectionFailed
-            errors.add(:base, I18n.t('errors.messages.salou_census.connection_failed'))
+            errors.add(:base, I18n.t('errors.messages.salou_census_authorization_handler.connection_failed'))
             return nil
           rescue Faraday::TimeoutError
-            errors.add(:base, I18n.t('errors.messages.salou_census.connection_timeout'))
+            errors.add(:base, I18n.t('errors.messages.salou_census_authorization_handler.connection_timeout'))
             return nil
           end
         end
@@ -181,13 +277,6 @@ module Decidim
           @sanitize_document_number ||= document_number&.to_s
         end
 
-        # Birthdate must be in a DD/MM/YYYY format
-        #
-        # Returns a String
-        def sanitize_birthdate
-          @sanitize_birthdate ||= birthdate&.to_s
-        end
-
         # Retrieve isHabitante value of WS response
         #
         # Returns a Integer
@@ -223,7 +312,6 @@ module Decidim
         #
         # Returns a boolean
         def census_exist?
-          # response with `isHabitante` value lower than 0, user data is in census
           sanitize_is_habitante < 0 && sanitize_birthdate == sanitize_fecha_nacimiento
         end
 
@@ -231,8 +319,7 @@ module Decidim
         #
         # Returns the verification_code as String
         def generate_sanitized_verification_code
-          # raise
-          self.verification_code = SalouCensusDigest.new('salou_census', salou_census_data_attributes).generate
+          SalouCensusDigest.new('salou_census', salou_census_data_attributes).generate
         end
 
         def salou_census_data_attributes
