@@ -52,8 +52,6 @@ module Decidim
         #
         # Returns a boolean
         def salou_census_valid?
-          puts "errors.any? #{errors.any?}"
-          puts "response.blank? #{response.blank?}"
           return false if errors.any? || response.blank?
 
           if success_response?
