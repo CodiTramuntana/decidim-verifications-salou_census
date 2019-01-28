@@ -52,6 +52,8 @@ module Decidim
         #
         # Returns a boolean
         def salou_census_valid?
+          puts "errors.any? #{errors.any?}"
+          puts "response.blank? #{response.blank?}"
           return false if errors.any? || response.blank?
 
           if success_response?
@@ -115,7 +117,7 @@ module Decidim
                                          .find_by(%(metadata @> '{"verification_code": "#{verification_code}"}'))
 
           return unless authorization
-          errors.add(:base, I18n.t('errors.messages.salou_census_authorization_handler.not_correspond')) unless authorization.verification_code == verification_code
+          errors.add(:base, I18n.t('errors.messages.salou_census_authorization_handler.not_correspond')) unless authorization.metadata["verification_code"] == verification_code
         end
 
         # Check for WS needed values
