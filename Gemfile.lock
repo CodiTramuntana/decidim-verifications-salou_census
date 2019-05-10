@@ -1,10 +1,10 @@
 PATH
   remote: .
   specs:
-    decidim-verifications-salou_census (0.3.2)
-      decidim-admin (~> 0.16.0)
-      decidim-core (~> 0.16.0)
-      decidim-verifications (~> 0.16.0)
+    decidim-verifications-salou_census (0.3.3)
+      decidim-admin (>= 0.16.0)
+      decidim-core (>= 0.16.0)
+      decidim-verifications (>= 0.16.0)
       rails (>= 5.2)
 
 GEM
@@ -726,7 +726,7 @@ DEPENDENCIES
   bootsnap
   byebug (~> 10.0)
   decidim (~> 0.16.0)
-  decidim-dev (~> 0.16.0)
+  decidim-dev (>= 0.16.0)
   decidim-verifications-salou_census!
   faker (~> 1.8)
   letter_opener_web (~> 1.3.3)
@@ -738,4 +738,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   1.17.1
+   1.17.3
